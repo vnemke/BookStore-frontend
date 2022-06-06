@@ -1,66 +1,108 @@
-import { useState, Fragment } from "react";
+import { useState, useEffect, useCallback, Fragment } from "react";
 
 import "./BooksList.css";
 import Book from "./Book";
 import AddBook from "./AddBook";
 
-const random_books = [
-  {
-    id: "b1",
-    name: "Jungle book",
-    author: "Rudyard Kipling",
-    year: 1894,
-    price: 15,
-  },
-  {
-    id: "b2",
-    name: "Tom Sawyer",
-    author: "Mark Twain",
-    year: 1876,
-    price: 12,
-  },
-  {
-    id: "b3",
-    name: "Harry Potter",
-    author: "J. K. Rowling",
-    year: 1997,
-    price: 20,
-  },
-];
-
 const BooksList = () => {
-  const [booksList, setBooksList] = useState(random_books);
+  const [booksList, setBooksList] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  const addBookHandler = (bName, bAuthor, bYear, bPrice) => {
-    setBooksList((prevBooksList) => {
-      return [
-        ...prevBooksList,
-        {
-          id: Math.random().toString(),
-          name: bName,
-          author: bAuthor,
-          year: bYear,
-          price: bPrice,
+  const fetchData = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/books");
+      if (!res.ok) {
+        throw new Error("Something went wrong");
+      }
+      const data = await res.json();
+
+      setBooksList(data);
+    } catch (error) {
+      setError(error.message);
+    }
+    setIsLoading(false);
+  }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  const addBookHandler = async (
+    name,
+    author,
+    genre,
+    publisher,
+    year,
+    price
+  ) => {
+    setIsLoading(true);
+    setError(null);
+    const book = {
+      bookName: name,
+      releaseYear: year,
+      price: price,
+      description: "test",
+      coverUrl: "testUrl",
+      authors: author,
+      genres: genre,
+      PublisherId: publisher,
+    };
+    try {
+      const res = await fetch("/api/books", {
+        method: "POST",
+        body: JSON.stringify(book),
+        headers: {
+          "Content-Type": "application/json",
         },
-      ];
-    });
+      });
+      if (!res.ok) {
+        throw new Error("Something went wrong");
+      }
+      const data = await res.json();
+
+      setBooksList((prevBooksList) => {
+        return [...prevBooksList, data];
+      });
+    } catch (error) {
+      setError(error.message);
+    }
+    setIsLoading(false);
   };
 
   const books = booksList.map((book) => (
     <Book
       key={book.id}
       id={book.id}
-      name={book.name}
-      author={book.author}
-      year={book.year}
+      name={book.bookName}
+      author={book.Authors}
+      genre={book.Genres}
+      publisher={book.Publisher}
+      year={book.releaseYear}
       price={book.price}
     />
   ));
 
+  let content = <p>Found no books</p>;
+
+  if (books.length > 0) {
+    content = <div className="container">{books}</div>;
+  }
+
+  if (isLoading) {
+    content = <p>Loading...</p>;
+  }
+
+  if (error) {
+    content = <p>{error}</p>;
+  }
+
   return (
     <Fragment>
       <AddBook onAddBook={addBookHandler} />
-      <div className="container">{books}</div>
+      {content}
     </Fragment>
   );
 };

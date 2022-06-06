@@ -25,7 +25,7 @@ const Cart = (props) => {
           key={item.id}
           name={item.name}
           amount={item.amount}
-          price={item.pice}
+          price={item.price}
           onRemove={cartItemRemoveHandler.bind(null, item.id)}
           onAdd={cartItemAddHandler.bind(null, item)}
         />
@@ -37,7 +37,7 @@ const Cart = (props) => {
     <Modal>
       {cartItems}
       <div>
-        <span>Total Amount</span>
+        <span>Total Amount </span>
         <span>{totalAmount}</span>
       </div>
       <div>
