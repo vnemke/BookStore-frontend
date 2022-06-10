@@ -1,34 +1,21 @@
-import { useState, useEffect, useCallback, Fragment } from "react";
+import { useState, useEffect, Fragment } from "react";
 
 import "./BooksList.css";
 import Book from "./Book";
 import AddBook from "./AddBook";
+import useHttp from "../../hooks/use-http";
 
 const BooksList = () => {
   const [booksList, setBooksList] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
 
-  const fetchData = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const res = await fetch("/api/books");
-      if (!res.ok) {
-        throw new Error("Something went wrong");
-      }
-      const data = await res.json();
-
-      setBooksList(data);
-    } catch (error) {
-      setError(error.message);
-    }
-    setIsLoading(false);
-  }, []);
+  const { isLoading, error, sendRequest: sendBookRequest } = useHttp();
 
   useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    const transformBooks = (data) => {
+      setBooksList(data);
+    };
+    sendBookRequest({ url: "/api/books" }, transformBooks);
+  }, [sendBookRequest]);
 
   const addBookHandler = async (
     name,
@@ -38,8 +25,6 @@ const BooksList = () => {
     year,
     price
   ) => {
-    setIsLoading(true);
-    setError(null);
     const book = {
       bookName: name,
       releaseYear: year,
@@ -50,26 +35,24 @@ const BooksList = () => {
       genres: genre,
       PublisherId: publisher,
     };
-    try {
-      const res = await fetch("/api/books", {
+
+    const crateBook = (book) => {
+      setBooksList((prevBooksList) => {
+        return [...prevBooksList, book];
+      });
+    };
+
+    sendBookRequest(
+      {
+        url: "/api/books",
         method: "POST",
-        body: JSON.stringify(book),
         headers: {
           "Content-Type": "application/json",
         },
-      });
-      if (!res.ok) {
-        throw new Error("Something went wrong");
-      }
-      const data = await res.json();
-
-      setBooksList((prevBooksList) => {
-        return [...prevBooksList, data];
-      });
-    } catch (error) {
-      setError(error.message);
-    }
-    setIsLoading(false);
+        body: book,
+      },
+      crateBook
+    );
   };
 
   const books = booksList.map((book) => (
