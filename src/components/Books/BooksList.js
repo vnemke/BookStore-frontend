@@ -7,58 +7,29 @@ import useHttp from "../../hooks/use-http";
 
 const BooksList = () => {
   const [booksList, setBooksList] = useState([]);
-
-  const { isLoading, error, sendRequest: sendBookRequest } = useHttp();
+  const [newBook, setNewBook] = useState({});
+  const { isLoading, error, sendRequest: sendBooksRequest } = useHttp();
 
   useEffect(() => {
     const transformBooks = (data) => {
       setBooksList(data);
     };
-    sendBookRequest({ url: "/api/books" }, transformBooks);
-  }, [sendBookRequest]);
+    sendBooksRequest({ url: "/api/books" }, transformBooks);
+  }, [sendBooksRequest]);
 
-  const addBookHandler = async (
-    name,
-    author,
-    genre,
-    publisher,
-    year,
-    price
-  ) => {
-    const book = {
-      bookName: name,
-      releaseYear: year,
-      price: price,
-      description: "test",
-      coverUrl: "testUrl",
-      authors: author,
-      genres: genre,
-      PublisherId: publisher,
-    };
-
-    const crateBook = (book) => {
-      setBooksList((prevBooksList) => {
-        return [...prevBooksList, book];
-      });
-    };
-
-    sendBookRequest(
-      {
-        url: "/api/books",
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: book,
-      },
-      crateBook
-    );
+  const passedBook = (book) => {
+    setNewBook(book);
   };
 
-  const books = booksList.map((book) => (
+  useEffect(() => {
+    setBooksList((prevList) => {
+      return [...prevList, newBook];
+    });
+  }, [newBook]);
+
+  const books = booksList.map((book, index) => (
     <Book
-      key={book.id}
-      id={book.id}
+      key={index}
       name={book.bookName}
       author={book.Authors}
       genre={book.Genres}
@@ -84,7 +55,7 @@ const BooksList = () => {
 
   return (
     <Fragment>
-      <AddBook onAddBook={addBookHandler} />
+      <AddBook passedBook={passedBook} />
       {content}
     </Fragment>
   );

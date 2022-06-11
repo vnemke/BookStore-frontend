@@ -16,6 +16,11 @@ const AddBook = (props) => {
   const [selectedPublisher, setSelectedPublisher] = useState("");
   const [enteredYear, setEnteredYear] = useState("");
   const [enteredPrice, setEnteredPrice] = useState("");
+  const [newBook, setNewBook] = useState({});
+  //pass prop to books list
+  useEffect(() => {
+    props.passedBook(newBook);
+  });
 
   //http hook
   const { sendRequest } = useHttp();
@@ -61,13 +66,31 @@ const AddBook = (props) => {
       return;
     }
 
-    props.onAddBook(
-      enteredName,
-      selectedAuthor,
-      selectedGenre,
-      selectedPublisher,
-      enteredYear,
-      enteredPrice
+    const book = {
+      bookName: enteredName,
+      releaseYear: enteredYear,
+      price: enteredPrice,
+      description: "test",
+      coverUrl: "testUrl",
+      authors: selectedAuthor,
+      genres: selectedGenre,
+      PublisherId: selectedPublisher,
+    };
+
+    const transformBook = (data) => {
+      setNewBook(data);
+    };
+
+    sendRequest(
+      {
+        url: "/api/books",
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: book,
+      },
+      transformBook
     );
 
     setEnteredName("");
