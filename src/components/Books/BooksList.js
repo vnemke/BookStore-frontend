@@ -30,6 +30,7 @@ const BooksList = () => {
   const books = booksList.map((book, index) => (
     <Book
       key={index}
+      id={book.id}
       name={book.bookName}
       author={book.Authors}
       genre={book.Genres}

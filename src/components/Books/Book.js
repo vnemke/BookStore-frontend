@@ -14,7 +14,6 @@ const Book = (props) => {
     });
   };
 
-
   const authors = props.author.map((a) => <div key={a.id}>{a.authorName}</div>);
   const genres = props.genre.map((g) => <div key={g.id}>{g.genreName}</div>);
 
