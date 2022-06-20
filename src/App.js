@@ -1,32 +1,43 @@
-import { Fragment, useState } from "react";
-import { useSelector } from "react-redux/es/hooks/useSelector";
+import { Fragment, useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { fetchCartData, sendCartData } from "./store/cart-actions";
 
 import Header from "./components/Layout/Header";
 import BooksList from "./components/Books/BooksList";
 import Cart from "./components/Cart/Cart";
-import CartProvider from "./store/cartProvider";
 import Auth from "./components/Auth";
 
+let isInitial = true;
 function App() {
+  const dispatch = useDispatch();
   const isAuth = useSelector((state) => state.auth.isAuthenticated);
-  const [cartIsShown, setCartIsShown] = useState(false);
+  const showCart = useSelector((state) => state.ui.cartIsVisible);
+  const cart = useSelector((state) => state.cart);
 
-  const showCartHandler = () => {
-    setCartIsShown(true);
-  };
-  const hideCartHandler = () => {
-    setCartIsShown(false);
-  };
+  useEffect(() => {
+    dispatch(fetchCartData());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (isInitial) {
+      isInitial = false;
+      return;
+    }
+
+    if (cart.changed) {
+      dispatch(sendCartData(cart));
+    }
+  }, [cart, dispatch]);
 
   return (
     <Fragment>
       {!isAuth && <Auth />}
       {isAuth && (
-        <CartProvider>
-          {cartIsShown && <Cart onClose={hideCartHandler} />}
-          <Header onShowCart={showCartHandler} />
+        <Fragment>
+          <Header />
+          {showCart && <Cart />}
           <BooksList />
-        </CartProvider>
+        </Fragment>
       )}
     </Fragment>
   );

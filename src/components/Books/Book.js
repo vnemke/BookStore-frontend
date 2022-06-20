@@ -1,17 +1,21 @@
-import { useContext } from "react";
+import { useDispatch } from "react-redux";
+import { cartActions } from "../../store/cart-slice";
 
-import CartContext from "../../store/cart-context";
 import "./BooksList.css";
 
 const Book = (props) => {
-  const cartCtx = useContext(CartContext);
+  const dispatch = useDispatch();
+
+
   const addToCartHandler = () => {
-    cartCtx.addItem({
-      id: props.id,
-      name: props.name,
-      amount: 1,
-      price: props.price,
-    });
+    dispatch(
+      cartActions.addItemToCart({
+        id: props.id,
+        name: props.name,
+        price: props.price
+        // totalPrice: props.price,
+      })
+    );
   };
 
   const authors = props.author.map((a) => <div key={a.id}>{a.authorName}</div>);
