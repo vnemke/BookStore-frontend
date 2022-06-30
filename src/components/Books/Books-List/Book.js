@@ -1,19 +1,21 @@
 import { useDispatch } from "react-redux";
-import { cartActions } from "../../store/cart-slice";
+import { cartActions } from "../../../store/cart-slice";
+
+import { Link } from "react-router-dom";
 
 import "./BooksList.css";
 
 const Book = (props) => {
   const dispatch = useDispatch();
 
+  console.log(props);
 
   const addToCartHandler = () => {
     dispatch(
       cartActions.addItemToCart({
         id: props.id,
         name: props.name,
-        price: props.price
-        // totalPrice: props.price,
+        price: props.price,
       })
     );
   };
@@ -26,11 +28,10 @@ const Book = (props) => {
       <div className="col-12">{props.name}</div>
       <div className="col-12">{authors}</div>
       <div className="col-12">{genres}</div>
-      <div className="col-12">Year: {props.year}</div>
       <div className="col-12">Price: {props.price}&euro;</div>
-      <div className="col-12">Publisher: {props.publisher.publisherName} </div>
       <div className="col-12 add_button">
         <button onClick={addToCartHandler}>+Add</button>
+        <Link to={`/books/${props.id}`}>Details</Link>
       </div>
     </div>
   );

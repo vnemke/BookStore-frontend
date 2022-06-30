@@ -1,7 +1,8 @@
-import { useDispatch } from "react-redux";
-import { authActions } from "../store/auth-slice";
 
-import "./Auth.css";
+import { useDispatch } from "react-redux";
+import { authActions } from "../../store/auth-slice";
+
+import "../Auth/Auth.css";
 
 const Auth = () => {
   const dispatch = useDispatch();
@@ -11,6 +12,8 @@ const Auth = () => {
 
     dispatch(authActions.login());
   };
+
+
 
   return (
     <div className="login-container">
@@ -27,7 +30,9 @@ const Auth = () => {
           </div>
 
           <div className="col-12 d-flex justify-content-center">
-            <button type="submit">Login</button>
+            <button type="submit">
+              Login
+            </button>
           </div>
         </div>
       </form>

@@ -1,24 +1,30 @@
-import { Fragment } from "react";
-import { useDispatch, useSelector } from "react-redux/es/exports";
+import { NavLink } from "react-router-dom";
+
+import { useDispatch } from "react-redux/es/exports";
 import { authActions } from "../../store/auth-slice";
 import CartButton from "./CartButton";
 
-const Header = (props) => {
+const Header = () => {
   const dispatch = useDispatch();
 
-  const isAuth = useSelector((state) => state.auth.isAuthenticated);
   const logoutHandler = () => {
     dispatch(authActions.logout());
   };
 
   return (
     <header>
-      {isAuth && (
-        <Fragment>
-          <CartButton />
-          <button onClick={logoutHandler}>Logout</button>
-        </Fragment>
-      )}
+      <nav>
+        <ul>
+          <li>
+            <NavLink to="/home">Home</NavLink>
+          </li>
+          <li>
+            <NavLink to="/books">Books list</NavLink>
+          </li>
+        </ul>
+      </nav>
+      <CartButton />
+      <button onClick={logoutHandler}>Logout</button>
     </header>
   );
 };
